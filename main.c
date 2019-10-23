@@ -54,7 +54,7 @@ void Map_CTOR(Map* this, int height, int width, int mineNum){
     int tileamt = width * height;
 
     // Holds location of mines
-    int* mineLocs = malloc(mineNum * sizeof(int));
+    int* mineLocs = calloc(mineNum, sizeof(int));
     
     int tempMineLoc;
 
@@ -76,13 +76,13 @@ void Map_CTOR(Map* this, int height, int width, int mineNum){
         }
     }
     // Allocate memory
-    this->map = (Tile *) malloc(tileamt *sizeof(Tile));
     final:
-	tempmap = malloc(tileamt * sizeof(Tile));
+    this->map = (Tile *) calloc(tileamt, sizeof(Tile));
+	Tile * startingTile = this->map;
 	int tempYPos = 0;
     for (int tempXPos = 0; tempYPos!=height-1 ; tempXPos++){
         // Indexing the map at 0
-		Tile temptile = {tempXPos, tempYPos, false};
+		Tile temptile = {tempXPos, tempYPos, false}; // Cant do that local var will kersplode when scope is left
 		this->map = &temptile;
         this->map++;
 		if (tempXPos == width){
@@ -91,7 +91,7 @@ void Map_CTOR(Map* this, int height, int width, int mineNum){
 		}
     }
 	// Go back to the starting point
-	this->map - (sizeof(Tile) * tileamt);
+	this->map = startingTile;
 
     for (mineLocs; mineLocs != 0; mineLocs++){ //TODO assign tiles their mines, if they have them
 		for (int i = 0; i != tileamt; i++){
