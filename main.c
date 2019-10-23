@@ -23,7 +23,8 @@ bool mineExists(int* mineArray, int newMine, int mapSize){
 typedef struct
 {
     // Location within the map
-    int xPos, yPos;
+    int xPos; 
+	int yPos;
     // true if there is a mine
     bool mine;
 } Tile;
@@ -31,8 +32,8 @@ typedef struct
 // Map
 typedef struct
 {
-    // 2D Array of tiles. Stored in row-major order
-    Tile* map;
+    // Array of tiles. Stored in row-major order
+    Tile *map;
     // Dimensions
     int height;
     int width;
@@ -75,21 +76,32 @@ void Map_CTOR(Map* this, int height, int width, int mineNum){
         }
     }
     // Allocate memory
-    this->map = malloc(tileamt *sizeof(Tile));
+    this->map = (Tile *) malloc(tileamt *sizeof(Tile));
     final:
-    tempmap = malloc(tileamt * sizeof(Tile));
-    for (int i = 1; i < tileamt+1; i++){ //TODO Assign the tiles their positions
-        // Translate from the 1D to 2D in row major order
-        this->map->xPos =
-        this->map->yPos = 
+	tempmap = malloc(tileamt * sizeof(Tile));
+	int tempYPos = 0;
+    for (int tempXPos = 0; tempYPos!=height-1 ; tempXPos++){
+        // Indexing the map at 0
+		Tile temptile = {tempXPos, tempYPos, false};
+		this->map = &temptile;
         this->map++;
+		if (tempXPos == width){
+			tempYPos++;
+			tempXPos = 0;
+		}
     }
+	// Go back to the starting point
+	this->map - (sizeof(Tile) * tileamt);
 
     for (mineLocs; mineLocs != 0; mineLocs++){ //TODO assign tiles their mines, if they have them
-
-        // From I, get the til
-        // tempmap->xPos
-        // tempmap->xpos
+		for (int i = 0; i != tileamt; i++){
+			if (i == *mineLocs) {
+				// this->map + i*(sizeof(Tile))->mine = true;
+				(*this).map += i * sizeof(Tile);
+				(*this).map->mine= true;
+				(*this).map -= i * sizeof(Tile);
+			}
+		}
         // if (i == mineLocs)
     }
     free(mineLocs);
