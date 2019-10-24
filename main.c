@@ -5,41 +5,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
 #include "helpers.h"
-// Map
-typedef struct
-{
-    // Location within the map
-    int xPos; 
-	int yPos;
-    // true if there is a mine
-    bool mine;
-} Tile;
+#include "main.h"
 
-// Map
-typedef struct
-{
-    // Array of tiles. Stored in row-major order
-    Tile **map;
-    // Dimensions
-    int height;
-    int width;
-    int mineNum;
-    // Methods
-} Map;
-
-// Tile Methods
-// Map Methods
 
 void Map_CTOR(Map* this, int height, int width, int mineNum){
     srand(time(NULL));
 
+    int tileamt = width * height;
     this->height = height;
     this->width = width;
     this->mineNum = mineNum;
-
-    int tileamt = width * height;
+    this->corners[0]=0;
+    this->corners[1]=width-1;
+    this->corners[2]= tileamt - width ;
+    this->corners[3]= tileamt - 1;
 
     // Holds location of mines
     int* mineLocs = calloc(mineNum, sizeof(int));
@@ -75,6 +55,8 @@ void Map_CTOR(Map* this, int height, int width, int mineNum){
         newTile->mine = false;
         newTile->xPos = tempXPos;
         newTile->yPos = tempYPos;
+        newTile->state = hidden;
+
         *this->map = newTile;
 		// this->map
         this->map++;
@@ -96,34 +78,50 @@ void Map_CTOR(Map* this, int height, int width, int mineNum){
         mineLocs++;
     }
     mineLocs -= mineNum;
-    free(mineLocs);
+    free(mineLocs); // Get rid of dis
 }
 
 void Map_Draw(Map* this){ // TODO implement drawing
     int startingChar = 65; //ASCII A
-
+    int startingNum  = 0;
     // Draw the Y axis legend first
     // Chess coords have it lettered from A to whatever
     // Although with large boards, we may have to do something else
+    Tile ** startingPos = this->map;
     for(int y = 0; y != (this->width); y++){
         printf(" %c ", startingChar + y);
     }
-}
+    printf("\n");
+    // Start writing the row numbers along with tile boxes
+    for(int row = 0; row != (this->height); row ++){ // Looping through the rows
+        for(int width = 0; width != (this->width); width++){
+            drawTop();
+        }
 
-void selectTile(int x, int y){
-    // Check if our selection was a mine
-    // TODO implement failure/winning
+        printf("\n %i ", startingNum);
+        for(int width = 0; width != (this->width); width++){ // Looping through tiles themselves
+            drawBox((*this->map));
+            this->map++;
+        }
+        printf("\n");
+        startingNum++;
+    }
 }
+// void Map_selectTile(int x, int y){
+//     // Check if our selection was a mine
+//     // TODO implement failure/winning
+//     ;
+// }
 
 
 int main(int argc, char *argv[]){
     // Create map from passed dimensions and minecount
-    // Take input from the command line.
+    // TODO: Take input from the command line. 
     Map mymap;
     Map_CTOR(&mymap, 5, 5, 3);
     Map_Draw(&mymap);
-    while (1){
-        /* gameloop */
-    }
-    
+    // while (1){
+    //     /* gameloop */
+    //     ;
+    // }
 }
