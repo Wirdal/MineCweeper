@@ -1,7 +1,7 @@
 // One large MEGAFILE
 // Not messing around with headers and shit unless I need to.
 #include <stdbool.h>
-#include <time.h> // For counting the time it took
+#include <time.h> // For counting the time it took. + Seeding
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -106,28 +106,50 @@ void Map_Draw(Map* this){ // TODO implement drawing
             this->map++;
         }
         startingNum++;
-    printf("\n   "); // Indent, and draw the tops
-    for(int width = 0; width != (this->width); width++){
-        drawTop(); //( ͡° ͜ʖ ͡°)
+        printf("\n   "); // Indent, and draw the tops
+        for(int width = 0; width != (this->width); width++){
+            drawTop(); //( ͡° ͜ʖ ͡°)
+        }
+        printf("-"); // Once more
     }
-    printf("-"); // Once more
-    }
+    printf("\n");
 }
-// void Map_selectTile(int x, int y){
-//     // Check if our selection was a mine
-//     // TODO implement failure/winning
-//     ;
-// }
-
+void Map_selectTile(Map* this, int x, int y){
+    // Check if our selection was a mine
+    // TODO implement failure/winning
+    ;
+}
 
 int main(int argc, char *argv[]){
+    char input[4];
+    if (argc != 4){
+        printf("Please input the height, width, and amount of mines, in that order. \n ");
+        return false;
+    }
+    // printf("Arg1 %i, arg2, %i, arg3 %i", atoi(argv[1]), atoi(argv[2]), atoi(argv[3]));
     // Create map from passed dimensions and minecount
     // TODO: Take input from the command line. 
     Map mymap;
-    Map_CTOR(&mymap, 5, 5, 3);
+    Map_CTOR(&mymap, atoi(argv[1]), atoi(argv[2]), atoi(argv[3]));
     Map_Draw(&mymap);
-    // while (1){
-    //     /* gameloop */
-    //     ;
-    // }
+    while (1){
+            fgets(input, 4, stdin);
+            // printf("1:%c  2:%c  3:%c  4:%c \n", input[0], input[1], input[2], input[3]);
+            switch (input[0]){
+                case 'h':
+                    printf("Mines: %i\nFlags Left: %i", mymap.mineNum, mymap.minesLeft);
+                    printf("Valid command are: \n(h)elp\n(f)lag\n(r)eveal\nPlease give coordinates after flagging and revleaing, with colchar and rownum\n Seperate everything with a space");
+                    break;
+                case 'f':
+                    printf("flag");
+                    break;
+                case 'r':
+                    printf("reveal");
+                    break;
+                default:
+                    printf("Please give a valid command\n");
+                    break;
+            }
+            fflush(stdin);
+    }
 }
