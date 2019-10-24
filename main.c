@@ -88,23 +88,29 @@ void Map_Draw(Map* this){ // TODO implement drawing
     // Chess coords have it lettered from A to whatever
     // Although with large boards, we may have to do something else
     Tile ** startingPos = this->map;
+    printf("    ");
     for(int y = 0; y != (this->width); y++){
-        printf(" %c ", startingChar + y);
+        printf(" %c  ", startingChar + y);
     }
-    printf("\n");
+    printf("\n   "); // Newline, and indent for the tops
     // Start writing the row numbers along with tile boxes
+    for(int width = 0; width != (this->width); width++){
+        drawTop();
+    }
+    printf("-"); //Get that last lil bit
+    // Draw the contents of the row
     for(int row = 0; row != (this->height); row ++){ // Looping through the rows
-        for(int width = 0; width != (this->width); width++){
-            drawTop();
-        }
-
-        printf("\n %i ", startingNum);
+        printf("\n %i |", startingNum);
         for(int width = 0; width != (this->width); width++){ // Looping through tiles themselves
             drawBox((*this->map));
             this->map++;
         }
-        printf("\n");
         startingNum++;
+    printf("\n   "); // Indent, and draw the tops
+    for(int width = 0; width != (this->width); width++){
+        drawTop(); //( ͡° ͜ʖ ͡°)
+    }
+    printf("-"); // Once more
     }
 }
 // void Map_selectTile(int x, int y){

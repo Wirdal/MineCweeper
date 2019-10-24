@@ -20,20 +20,20 @@ bool mineExists(int* mineArray, int newMine, int mapSize){
     return true;
 }
 void drawBox(Tile* tile){
+    // Each of these are drawing 4 characters
     if (tile->state == hidden){
-        printf("| |")
+        printf("   |");
     }
     else if (tile->state == clicked){
-        /* code */
-        ;
+        printf(" %i |", tile->mineDistance);
     }
     else{ //Flagged
-        ;
+        printf(" ! |");
     }
     
 }
 void drawTop(){
-    printf("---");
+    printf("----");
 }
 
 #endif
