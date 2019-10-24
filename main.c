@@ -3,22 +3,10 @@
 #include <stdbool.h>
 #include <time.h> // For counting the time it took
 #include <stdlib.h>
+#include <stdio.h>
 
-// Might put this in a header tho
 
-bool mineExists(int* mineArray, int newMine, int mapSize){
-    int* startingLoc = mineArray;
-    for(mineArray; *mineArray != 0; mineArray++){
-        if(newMine == *(mineArray)){
-            mineArray = startingLoc;
-            return false;
-        }
-    }
-    *mineArray = newMine;
-    // Go back to the begining
-    mineArray = startingLoc;
-    return true;
-}
+#include "helpers.h"
 // Map
 typedef struct
 {
@@ -33,7 +21,7 @@ typedef struct
 typedef struct
 {
     // Array of tiles. Stored in row-major order
-    Tile *map;
+    Tile **map;
     // Dimensions
     int height;
     int width;
@@ -77,13 +65,18 @@ void Map_CTOR(Map* this, int height, int width, int mineNum){
     }
     // Allocate memory
     final:
-    this->map = (Tile *) calloc(tileamt, sizeof(Tile));
-	Tile * startingTile = this->map;
+    this->map = (Tile **) calloc(tileamt, sizeof(Tile*));
+	Tile ** startingTile = this->map;
 	int tempYPos = 0;
-    for (int tempXPos = 0; tempYPos!=height-1 ; tempXPos++){
+    for (int tempXPos = 0; tempYPos!=height ; tempXPos++){
         // Indexing the map at 0
-		Tile temptile = {tempXPos, tempYPos, false}; // Cant do that local var will kersplode when scope is left
-		this->map = &temptile;
+        // Create a new tile
+        Tile* newTile = calloc(1, sizeof(Tile)); // We dont free this.
+        newTile->mine = false;
+        newTile->xPos = tempXPos;
+        newTile->yPos = tempYPos;
+        *this->map = newTile;
+		// this->map
         this->map++;
 		if (tempXPos == width){
 			tempYPos++;
@@ -93,22 +86,28 @@ void Map_CTOR(Map* this, int height, int width, int mineNum){
 	// Go back to the starting point
 	this->map = startingTile;
 
-    for (mineLocs; mineLocs != 0; mineLocs++){ //TODO assign tiles their mines, if they have them
-		for (int i = 0; i != tileamt; i++){
-			if (i == *mineLocs) {
-				// this->map + i*(sizeof(Tile))->mine = true;
-				(*this).map += i * sizeof(Tile);
-				(*this).map->mine= true;
-				(*this).map -= i * sizeof(Tile);
-			}
-		}
-        // if (i == mineLocs)
+    for (int j = 0; j != mineNum; j++){ //TODO assign tiles their mines, if they have them
+		
+        int i = *mineLocs;
+        this->map += i - 1;
+        (*this->map)->mine = true; //What is this notation
+        // Go back
+        this->map -= i - 1;
+        mineLocs++;
     }
+    mineLocs -= mineNum;
     free(mineLocs);
 }
 
 void Map_Draw(Map* this){ // TODO implement drawing
+    int startingChar = 65; //ASCII A
 
+    // Draw the Y axis legend first
+    // Chess coords have it lettered from A to whatever
+    // Although with large boards, we may have to do something else
+    for(int y = 0; y != (this->width); y++){
+        printf(" %c ", startingChar + y);
+    }
 }
 
 void selectTile(int x, int y){
@@ -122,7 +121,7 @@ int main(int argc, char *argv[]){
     // Take input from the command line.
     Map mymap;
     Map_CTOR(&mymap, 5, 5, 3);
-
+    Map_Draw(&mymap);
     while (1){
         /* gameloop */
     }
