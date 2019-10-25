@@ -16,10 +16,6 @@ void Map_CTOR(Map* this, int height, int width, int mineNum){
     this->height = height;
     this->width = width;
     this->mineNum = mineNum;
-    this->corners[0]=0;
-    this->corners[1]=width-1;
-    this->corners[2]= tileamt - width ;
-    this->corners[3]= tileamt - 1;
 
     // Holds location of mines
     int* mineLocs = calloc(mineNum, sizeof(int));
@@ -111,6 +107,7 @@ void Map_Draw(Map* this){ // TODO implement drawing
         }
         printf("-"); // Once more
     }
+    this->map = startingPos;
     printf("\n");
 }
 int Map_RowMJRfrom2D(Map* this, int x, int y){
@@ -174,9 +171,9 @@ int main(int argc, char *argv[]){
         // for(int i = 0; *(args +i); i++){
         // }
         int oneDPos = Map_RowMJRfrom2D(&mymap, ((**(args+1))-65), atoi(*(args+2)));
-        // printf("Col: %i, Row: %i ", ((**(args+1))-65), atoi(*(args+2))); //Test input reading
-        // printf("oneDPos %i", oneDPos);
-        Tile * tempTile = (*mymap.map+oneDPos);
+        // printf("Col: %i, Row: %i \n", ((**(args+1))-65), atoi(*(args+2))); //Test input reading
+        // printf("oneDPos %i \n", oneDPos);
+        Tile * tempTile = (*(mymap.map+oneDPos));
         switch (input[0]){
             case 'h':
                 printf("Mines: %i\nFlags Left: %i", mymap.mineNum, mymap.minesLeft);
@@ -191,6 +188,7 @@ int main(int argc, char *argv[]){
                     tempTile->state = hidden;
                 }
                 else{
+                    printf("Flagging %i %i\n", tempTile->xPos, tempTile->yPos);
                     tempTile->state = flagged;
                 }
                 break;
@@ -209,5 +207,7 @@ int main(int argc, char *argv[]){
                 break;
         }
         fflush(stdin);
+        Map_Draw(&mymap);
+        printf("Passing second draw\n");
     }
 }

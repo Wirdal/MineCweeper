@@ -25,10 +25,10 @@ void drawBox(Tile* tile){
     if (tile->state == hidden){
         printf("   |");
     }
-    else if (tile->state == clicked){
+    if (tile->state == clicked){
         printf(" %i |", tile->mineDistance);
     }
-    else{ //Flagged
+    if (tile->state == flagged){ 
         printf(" ! |");
     }
     
