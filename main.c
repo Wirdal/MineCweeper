@@ -80,7 +80,6 @@ void Map_CTOR(Map* this, int height, int width, int mineNum){
     mineLocs -= mineNum;
     free(mineLocs); // Get rid of dis
 }
-
 void Map_Draw(Map* this){ // TODO implement drawing
     int startingChar = 65; //ASCII A
     int startingNum  = 0;
@@ -114,14 +113,48 @@ void Map_Draw(Map* this){ // TODO implement drawing
     }
     printf("\n");
 }
-void Map_selectTile(Map* this, int x, int y){
-    // Check if our selection was a mine
-    // TODO implement failure/winning
-    ;
+int Map_RowMJRfrom2D(Map* this, int x, int y){
+    // matrix[ i ][ j ] = array[ y*w + x ].
+    int rowMjr = y * (this->width) + x;
+    return rowMjr;
 }
-
+int Map_findAdjMines(Map* this, int tilenum){
+    int possible = 0;
+    if((*this->map+1+tilenum)->mine){ //+1
+        possible++;
+    }
+    if((*this->map-1+tilenum)->mine){ // -1
+        possible++; 
+    }
+    if((*this->map-(this->width)+tilenum)->mine){ // -w
+        possible++; 
+    }
+    if((*this->map+(this->width)+tilenum)->mine){ // +w
+        possible++; 
+    }
+    if((*this->map+(this->width)+1+tilenum)->mine){ // +w + 1
+        possible++; 
+    }
+    if((*this->map+(this->width)-1+tilenum)->mine){ // +w -1
+        possible++; 
+    }
+    if((*this->map-(this->width)-1+tilenum)->mine){ // -w -1
+        possible++; 
+    }
+    if((*this->map-(this->width)+1+tilenum)->mine){ // -w + 1
+        possible++; 
+    }
+    return possible;
+}
+void Map_selectTile(Map* this, int tilenum){
+    ((*this->map+tilenum)->mineDistance=Map_findAdjMines(this, tilenum));
+    return;
+}
 int main(int argc, char *argv[]){
-    char input[4];
+    // 2 spaces; 1 action; 3 for height; 3 for width;
+    char input[12];
+    // 999 is our max
+    char ** args; // Over sizing it jic
     if (argc != 4){
         printf("Please input the height, width, and amount of mines, in that order. \n ");
         return false;
@@ -129,27 +162,52 @@ int main(int argc, char *argv[]){
     // printf("Arg1 %i, arg2, %i, arg3 %i", atoi(argv[1]), atoi(argv[2]), atoi(argv[3]));
     // Create map from passed dimensions and minecount
     // TODO: Take input from the command line. 
+    // [1] is a space. Need to find the next space;
+    printf("argc %i\n",argc);
     Map mymap;
     Map_CTOR(&mymap, atoi(argv[1]), atoi(argv[2]), atoi(argv[3]));
     Map_Draw(&mymap);
     while (1){
-            fgets(input, 4, stdin);
-            // printf("1:%c  2:%c  3:%c  4:%c \n", input[0], input[1], input[2], input[3]);
-            switch (input[0]){
-                case 'h':
-                    printf("Mines: %i\nFlags Left: %i", mymap.mineNum, mymap.minesLeft);
-                    printf("Valid command are: \n(h)elp\n(f)lag\n(r)eveal\nPlease give coordinates after flagging and revleaing, with colchar and rownum\n Seperate everything with a space");
-                    break;
-                case 'f':
-                    printf("flag");
-                    break;
-                case 'r':
-                    printf("reveal");
-                    break;
-                default:
-                    printf("Please give a valid command\n");
-                    break;
-            }
-            fflush(stdin);
+        fgets(input, 12, stdin);
+        // Find the spots that are spaces and split up accordingly
+        args = strSplit(input, ' ');
+        // for(int i = 0; *(args +i); i++){
+        // }
+        int oneDPos = Map_RowMJRfrom2D(&mymap, ((**(args+1))-65), atoi(*(args+2)));
+        // printf("Col: %i, Row: %i ", ((**(args+1))-65), atoi(*(args+2))); //Test input reading
+        // printf("oneDPos %i", oneDPos);
+        Tile * tempTile = (*mymap.map+oneDPos);
+        switch (input[0]){
+            case 'h':
+                printf("Mines: %i\nFlags Left: %i", mymap.mineNum, mymap.minesLeft);
+                printf("Valid command are: \n(h)elp\n(f)lag\n(r)eveal\nPlease give coordinates after flagging and revleaing, with colchar and rownum\n Seperate everything with a space. Cases matter");
+                break;
+            case 'f':
+                // Tile * tempTile = (*mymap.map);
+                if (tempTile->state == clicked){
+                    printf("Tile already revealed\n");
+                }
+                else if (tempTile->state == flagged){
+                    tempTile->state = hidden;
+                }
+                else{
+                    tempTile->state = flagged;
+                }
+                break;
+            case 'r':
+                printf("reveal");
+                if (tempTile->mine = true){
+                    GameOver();
+                    return false;
+                }
+                else{
+                    Map_selectTile(&mymap, oneDPos);
+                }
+                break;
+            default:
+                printf("Please give a valid command. Try inputing 'h' if you need help. Remember, that case matters!\n");
+                break;
+        }
+        fflush(stdin);
     }
 }
