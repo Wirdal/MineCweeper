@@ -74,6 +74,7 @@ void Map_CTOR(Map* this, int height, int width, int mineNum){
         mineLocs++;
     }
     mineLocs -= mineNum;
+    printf("Mineloc %i \n", *mineLocs);
     free(mineLocs); // Get rid of dis
 }
 void Map_Draw(Map* this){ // TODO implement drawing
@@ -116,6 +117,7 @@ int Map_RowMJRfrom2D(Map* this, int x, int y){
     return rowMjr;
 }
 int Map_findAdjMines(Map* this, int tilenum){
+    // Needs to all be error checked
     int possible = 0;
     if((*this->map+1+tilenum)->mine){ //+1
         possible++;
@@ -144,7 +146,9 @@ int Map_findAdjMines(Map* this, int tilenum){
     return possible;
 }
 void Map_selectTile(Map* this, int tilenum){
-    ((*this->map+tilenum)->mineDistance=Map_findAdjMines(this, tilenum));
+    (*this->map+tilenum)->mineDistance=Map_findAdjMines(this, tilenum);
+    (*this->map+tilenum)->state = clicked;
+    printf("Adj mines %i\n", Map_findAdjMines(this, tilenum));
     return;
 }
 int main(int argc, char *argv[]){
@@ -188,13 +192,11 @@ int main(int argc, char *argv[]){
                     tempTile->state = hidden;
                 }
                 else{
-                    printf("Flagging %i %i\n", tempTile->xPos, tempTile->yPos);
                     tempTile->state = flagged;
                 }
                 break;
             case 'r':
-                printf("reveal");
-                if (tempTile->mine = true){
+                if (tempTile->mine){
                     GameOver();
                     return false;
                 }
