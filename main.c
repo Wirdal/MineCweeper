@@ -43,25 +43,16 @@ void Map_CTOR(Map* this, int height, int width, int mineNum){
     final:
     this->map = (Tile **) calloc(tileamt, sizeof(Tile*));
 	Tile ** startingTile = this->map;
-	int tempYPos = 0;
-    int easyOneDPos = 0;
-    for (int tempXPos = 0; tempYPos!=height ; tempXPos++){
+    for (int oneDPos = 0; oneDPos !=  tileamt; oneDPos ++){
         // Indexing the map at 0
         // Create a new tile
         Tile* newTile = calloc(1, sizeof(Tile)); // We dont free this.
         newTile->mine = false;
-        newTile->xPos = tempXPos;
-        newTile->yPos = tempYPos;
         newTile->state = hidden;
-        newTile->rowMjrPos = easyOneDPos;
+        newTile->rowMjrPos = oneDPos;
         *this->map = newTile;
 		// this->map
         this->map++;
-		if (tempXPos == width){
-			tempYPos++;
-			tempXPos = 0;
-		}
-        easyOneDPos++;
     }
 	// Go back to the starting point
 	this->map = startingTile;
@@ -119,7 +110,7 @@ int Map_RowMJRfrom2D(Map* this, int x, int y){
     int rowMjr = y * (this->width) + x;
     return rowMjr;
 }
-int Map_findAdjMines(Map* this, int tilenum){
+int Map_findAdjMines(const Map* this, int tilenum){
     // Needs to all be error checked
     int possible = 0;
     printf("Adj mines tilenume: %i\n", tilenum);
@@ -181,10 +172,11 @@ int Map_findAdjMines(Map* this, int tilenum){
     }
     return possible;
 }
-void Map_selectTile(Map* this, int tilenum){
-    Tile * tile = (*(this->map)+tilenum);
-    tile->adjMines = Map_findAdjMines(this, tilenum);
+void Map_selectTile(const Map* this, int tilenum){
+    Tile * tile = (*(this->map+tilenum));
     tile->state = clicked;
+    printf("Tile claimed row major %i \n", tile->rowMjrPos);
+    tile->adjMines = Map_findAdjMines(this, tilenum);
     // printf("Adj mines %i\n", Map_findAdjMines(this, tilenum));
     return;
 }
@@ -193,7 +185,7 @@ int main(int argc, char *argv[]){
     char input[12];
     // 999 is our max
     char ** args; // Over sizing it jic
-    if (argc != 7){ // Change when not debugging
+    if (argc != 4){ // Change when not debugging
         printf("Please input the height, width, and amount of mines, in that order. \n ");
         return false;
     }
@@ -212,12 +204,10 @@ int main(int argc, char *argv[]){
         // for(int i = 0; *(args +i); i++){
         // }
         int oneDPos = Map_RowMJRfrom2D(&mymap, ((**(args+1))-65), atoi(*(args+2)));
-        printf("Col: %i, Row: %i \n", ((**(args+1))-65), atoi(*(args+2))); //Test input reading
+        // printf("Col: %i, Row: %i \n", ((**(args+1))-65), atoi(*(args+2))); //Test input reading
         printf("oneDPos %i \n", oneDPos);
         Tile * tempTile = (*(mymap.map+oneDPos));
-        printf("Tile claimed row major %i \n", tempTile->rowMjrPos);
         switch (input[0]){
-            printf("Switching\n");
             case 'h':
                 printf("Mines: %i\nFlags Left: %i\n", mymap.mineNum, mymap.minesLeft);
                 printf("Valid command are: \n(h)elp\n(f)lag\n(r)eveal\nPlease give coordinates after flagging and revleaing, with colchar and rownum\n Seperate everything with a space. Cases matter");

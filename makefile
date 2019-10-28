@@ -10,7 +10,7 @@ CC=gcc
 make: main.c
 	$(CC) main.c -o main.exe
 
-deubg:
+debug:
 	$(CC) main.c -ggdb -o main.exe
 
 clean:

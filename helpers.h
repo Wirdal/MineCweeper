@@ -22,7 +22,6 @@ bool mineExists(int* mineArray, int newMine, int mapSize){
 }
 void drawBox(Tile* tile){
     // Each of these are drawing 4 characters
-    printf("`%i`", tile->rowMjrPos);
     if (tile->state == hidden){
         printf("   |");
     }
@@ -85,6 +84,6 @@ char** strSplit(char* a_str, const char a_delim){
     return result;
 }
 void GameOver(){
-    printf("GAMEOVER"); // Place holder, for now.
+    printf("GAMEOVER\n"); // Place holder, for now.
 }
 #endif

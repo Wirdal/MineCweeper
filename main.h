@@ -11,9 +11,6 @@ typedef enum TileState{
 
 typedef struct
 {
-    // Location within the map
-    int xPos; 
-	int yPos;
 	// RowMjr position
 	int rowMjrPos;
     // true if there is a mine
