@@ -119,30 +119,30 @@ int Map_RowMJRfrom2D(Map* this, int x, int y){
 int Map_findAdjMines(Map* this, int tilenum){
     // Needs to all be error checked
     int possible = 0;
-    if((*this->map+1+tilenum)->mine){ //+1
-        possible++;
+    // Can we go up?
+    if (!(tilenum < this->width)){
+        if((*(this->map)+tilenum - this->width)->mine){
+            possible++;
+        }
     }
-    if((*this->map-1+tilenum)->mine){ // -1
-        possible++; 
+    // Can we go down?
+    if (!(tilenum > this->width)){
+        if((*(this->map)+tilenum + this->width)->mine){
+            possible++;
+        }
     }
-    if((*this->map-(this->width)+tilenum)->mine){ // -w
-        possible++; 
+    // Can we go left
+    if (!(tilenum % this->width == 0)){
+        if((*(this->map)+tilenum - 1)->mine){
+            possible++;
+        }
     }
-    if((*this->map+(this->width)+tilenum)->mine){ // +w
-        possible++; 
-    }
-    if((*this->map+(this->width)+1+tilenum)->mine){ // +w + 1
-        possible++; 
-    }
-    if((*this->map+(this->width)-1+tilenum)->mine){ // +w -1
-        possible++; 
-    }
-    if((*this->map-(this->width)-1+tilenum)->mine){ // -w -1
-        possible++; 
-    }
-    if((*this->map-(this->width)+1+tilenum)->mine){ // -w + 1
-        possible++; 
-    }
+    // Can we go right    
+    if (!(tilenum+1 % this->width == 0)){
+        if((*(this->map)+tilenum + 1)->mine){
+            possible++;
+        }
+    }    
     return possible;
 }
 void Map_selectTile(Map* this, int tilenum){
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]){
         Tile * tempTile = (*(mymap.map+oneDPos));
         switch (input[0]){
             case 'h':
-                printf("Mines: %i\nFlags Left: %i", mymap.mineNum, mymap.minesLeft);
+                printf("Mines: %i\nFlags Left: %i\n", mymap.mineNum, mymap.minesLeft);
                 printf("Valid command are: \n(h)elp\n(f)lag\n(r)eveal\nPlease give coordinates after flagging and revleaing, with colchar and rownum\n Seperate everything with a space. Cases matter");
                 break;
             case 'f':

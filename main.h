@@ -14,6 +14,8 @@ typedef struct
     // Location within the map
     int xPos; 
 	int yPos;
+	// RowMjr position
+	int rowMjrPos;
     // true if there is a mine
     bool mine;
     int mineDistance;
