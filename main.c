@@ -44,6 +44,7 @@ void Map_CTOR(Map* this, int height, int width, int mineNum){
     this->map = (Tile **) calloc(tileamt, sizeof(Tile*));
 	Tile ** startingTile = this->map;
 	int tempYPos = 0;
+    int easyOneDPos = 0;
     for (int tempXPos = 0; tempYPos!=height ; tempXPos++){
         // Indexing the map at 0
         // Create a new tile
@@ -52,7 +53,7 @@ void Map_CTOR(Map* this, int height, int width, int mineNum){
         newTile->xPos = tempXPos;
         newTile->yPos = tempYPos;
         newTile->state = hidden;
-
+        newTile->rowMjrPos = easyOneDPos;
         *this->map = newTile;
 		// this->map
         this->map++;
@@ -60,11 +61,12 @@ void Map_CTOR(Map* this, int height, int width, int mineNum){
 			tempYPos++;
 			tempXPos = 0;
 		}
+        easyOneDPos++;
     }
 	// Go back to the starting point
 	this->map = startingTile;
 
-    for (int j = 0; j != mineNum; j++){ //TODO assign tiles their mines, if they have them
+    for (int j = 0; j != mineNum; j++){ 
 		
         int i = *mineLocs;
         this->map += i - 1;
@@ -74,7 +76,7 @@ void Map_CTOR(Map* this, int height, int width, int mineNum){
         mineLocs++;
     }
     mineLocs -= mineNum;
-    printf("Mineloc %i \n", *mineLocs);
+    printf("Mineloc %i \n", *mineLocs - 1);
     free(mineLocs); // Get rid of dis
 }
 void Map_Draw(Map* this){ // TODO implement drawing
@@ -83,6 +85,7 @@ void Map_Draw(Map* this){ // TODO implement drawing
     // Draw the Y axis legend first
     // Chess coords have it lettered from A to whatever
     // Although with large boards, we may have to do something else
+
     Tile ** startingPos = this->map;
     printf("    ");
     for(int y = 0; y != (this->width); y++){
@@ -119,36 +122,70 @@ int Map_RowMJRfrom2D(Map* this, int x, int y){
 int Map_findAdjMines(Map* this, int tilenum){
     // Needs to all be error checked
     int possible = 0;
+    printf("Adj mines tilenume: %i\n", tilenum);
     // Can we go up?
     if (!(tilenum < this->width)){
-        if((*(this->map)+tilenum - this->width)->mine){
+        if((*(this->map)+(tilenum - this->width))->mine){
             possible++;
+            printf("Up\n");
         }
     }
     // Can we go down?
     if (!(tilenum > this->width)){
-        if((*(this->map)+tilenum + this->width)->mine){
+        if((*(this->map)+(tilenum + this->width))->mine){
             possible++;
+            printf("Down\n");
         }
     }
     // Can we go left
-    if (!(tilenum % this->width == 0)){
-        if((*(this->map)+tilenum - 1)->mine){
+    if (!(tilenum % this->width != 0)){
+        if((*(this->map)+(tilenum - 1))->mine){
             possible++;
+            printf("Left\n");
         }
     }
     // Can we go right    
-    if (!(tilenum+1 % this->width == 0)){
-        if((*(this->map)+tilenum + 1)->mine){
+    if (!(tilenum+1 % this->width != 0)){
+        if((*(this->map)+(tilenum + 1))->mine){
             possible++;
+            printf("Right\n");
         }
     }    
+    // Can we go up and left?
+    if (!(tilenum < this->width && tilenum % this->width != 0)){
+        if((*(this->map)+(tilenum - this->width - 1))->mine){
+            possible++;
+            printf("Up left\n");
+        }
+    }
+    // Can we go up and right?
+    if (!(tilenum < this->width && tilenum + 1 % this->width != 0)){
+        if((*(this->map)+(tilenum - this->width + 1))->mine){
+            possible++;
+            printf("Up right\n");
+        }
+    }
+    // Can we go down and left?
+    if (!(tilenum > this->width && tilenum % this->width != 0)){
+        if((*(this->map)+(tilenum - this->width - 1))->mine){
+            possible++;
+            printf("Down left\n");
+        }
+    }
+    // Can we go down and right?
+    if (!(tilenum > this->width && tilenum + 1% this->width != 0)){
+        if((*(this->map)+(tilenum - this->width + 1))->mine){
+            possible++;
+            printf("Down right\n");
+        }
+    }
     return possible;
 }
 void Map_selectTile(Map* this, int tilenum){
-    (*this->map+tilenum)->mineDistance=Map_findAdjMines(this, tilenum);
-    (*this->map+tilenum)->state = clicked;
-    printf("Adj mines %i\n", Map_findAdjMines(this, tilenum));
+    Tile * tile = (*(this->map)+tilenum);
+    tile->adjMines = Map_findAdjMines(this, tilenum);
+    tile->state = clicked;
+    // printf("Adj mines %i\n", Map_findAdjMines(this, tilenum));
     return;
 }
 int main(int argc, char *argv[]){
@@ -156,7 +193,7 @@ int main(int argc, char *argv[]){
     char input[12];
     // 999 is our max
     char ** args; // Over sizing it jic
-    if (argc != 4){
+    if (argc != 7){ // Change when not debugging
         printf("Please input the height, width, and amount of mines, in that order. \n ");
         return false;
     }
@@ -175,10 +212,12 @@ int main(int argc, char *argv[]){
         // for(int i = 0; *(args +i); i++){
         // }
         int oneDPos = Map_RowMJRfrom2D(&mymap, ((**(args+1))-65), atoi(*(args+2)));
-        // printf("Col: %i, Row: %i \n", ((**(args+1))-65), atoi(*(args+2))); //Test input reading
-        // printf("oneDPos %i \n", oneDPos);
+        printf("Col: %i, Row: %i \n", ((**(args+1))-65), atoi(*(args+2))); //Test input reading
+        printf("oneDPos %i \n", oneDPos);
         Tile * tempTile = (*(mymap.map+oneDPos));
+        printf("Tile claimed row major %i \n", tempTile->rowMjrPos);
         switch (input[0]){
+            printf("Switching\n");
             case 'h':
                 printf("Mines: %i\nFlags Left: %i\n", mymap.mineNum, mymap.minesLeft);
                 printf("Valid command are: \n(h)elp\n(f)lag\n(r)eveal\nPlease give coordinates after flagging and revleaing, with colchar and rownum\n Seperate everything with a space. Cases matter");
@@ -210,6 +249,5 @@ int main(int argc, char *argv[]){
         }
         fflush(stdin);
         Map_Draw(&mymap);
-        printf("Passing second draw\n");
     }
 }

@@ -18,7 +18,7 @@ typedef struct
 	int rowMjrPos;
     // true if there is a mine
     bool mine;
-    int mineDistance;
+    int adjMines;
     TileState state;
 
 }Tile;

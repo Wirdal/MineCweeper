@@ -22,11 +22,12 @@ bool mineExists(int* mineArray, int newMine, int mapSize){
 }
 void drawBox(Tile* tile){
     // Each of these are drawing 4 characters
+    printf("`%i`", tile->rowMjrPos);
     if (tile->state == hidden){
         printf("   |");
     }
     if (tile->state == clicked){
-        printf(" %i |", tile->mineDistance);
+        printf(" %i |", tile->adjMines);
     }
     if (tile->state == flagged){ 
         printf(" ! |");
