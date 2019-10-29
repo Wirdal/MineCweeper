@@ -111,65 +111,38 @@ int Map_RowMJRfrom2D(Map* this, int x, int y){
     return rowMjr;
 }
 int Map_findAdjMines(const Map* this, int tilenum){
-    // Needs to all be error checked
+    int width = this->width;
+    int totalTiles = (this->height * this->width);
+    Tile ** map = this->map;
     int possible = 0;
-    printf("Adj mines tilenume: %i\n", tilenum);
+    // Check orthoganals
+    // Up?
+    if (tilenum >= width){
+        if ((*(map-width+tilenum))->mine){
+            possible++;
+        }
+    }
+    // Down?
+    if (tilenum < totalTiles-width){
+        if ((*(map+width+tilenum))->mine){
+            possible++;
+        }
+    }
+    // Left?
+    if (tilenum % width != 0){
+        if ((*(map+tilenum-1))->mine){
+            possible++;
+        }
+    }
+    // Right?
+    if ((tilenum+1) % width != 0){
+        if ((*(map+tilenum+1))->mine){
+            possible++;
+        }
+    }
+    // Check diagonals
+    // Up left?
     // Can we go up?
-    if (!(tilenum < this->width)){
-        if((*(this->map)+(tilenum - this->width))->mine){
-            possible++;
-            printf("Up\n");
-        }
-    }
-    // Can we go down?
-    if (!(tilenum > this->width)){
-        if((*(this->map)+(tilenum + this->width))->mine){
-            possible++;
-            printf("Down\n");
-        }
-    }
-    // Can we go left
-    if (!(tilenum % this->width != 0)){
-        if((*(this->map)+(tilenum - 1))->mine){
-            possible++;
-            printf("Left\n");
-        }
-    }
-    // Can we go right    
-    if (!(tilenum+1 % this->width != 0)){
-        if((*(this->map)+(tilenum + 1))->mine){
-            possible++;
-            printf("Right\n");
-        }
-    }    
-    // Can we go up and left?
-    if (!(tilenum < this->width && tilenum % this->width != 0)){
-        if((*(this->map)+(tilenum - this->width - 1))->mine){
-            possible++;
-            printf("Up left\n");
-        }
-    }
-    // Can we go up and right?
-    if (!(tilenum < this->width && tilenum + 1 % this->width != 0)){
-        if((*(this->map)+(tilenum - this->width + 1))->mine){
-            possible++;
-            printf("Up right\n");
-        }
-    }
-    // Can we go down and left?
-    if (!(tilenum > this->width && tilenum % this->width != 0)){
-        if((*(this->map)+(tilenum - this->width - 1))->mine){
-            possible++;
-            printf("Down left\n");
-        }
-    }
-    // Can we go down and right?
-    if (!(tilenum > this->width && tilenum + 1% this->width != 0)){
-        if((*(this->map)+(tilenum - this->width + 1))->mine){
-            possible++;
-            printf("Down right\n");
-        }
-    }
     return possible;
 }
 void Map_selectTile(const Map* this, int tilenum){

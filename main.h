@@ -31,7 +31,6 @@ typedef struct
     // Mines
     int mineNum;
     int minesLeft;
-    int corners[4];
 } Map;
 
 
