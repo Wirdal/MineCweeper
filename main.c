@@ -142,7 +142,37 @@ int Map_findAdjMines(const Map* this, int tilenum){
     }
     // Check diagonals
     // Up left?
-    // Can we go up?
+    if(tilenum >= width){
+        if(tilenum % width != 0){
+            if((*(map+tilenum-width-1))->mine){
+                possible++;
+            }
+        }
+    }
+    // Up right
+    if(tilenum >= width){
+        if((tilenum+1) % width != 0){
+            if((*(map+tilenum-width+1))->mine){
+                possible++;
+            }
+        }
+    }
+    // Down left?
+    if(tilenum < totalTiles - width){
+        if(tilenum % width != 0){
+            if((*(map+tilenum+width-1))->mine){
+                possible++;
+            }
+        }
+    }
+    // Down right?
+    if(tilenum < totalTiles - width){
+        if((tilenum+1) % width != 0){
+            if((*(map+tilenum+width+1))->mine){
+                possible++;
+            }
+        }
+    }
     return possible;
 }
 void Map_selectTile(const Map* this, int tilenum){
