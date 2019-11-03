@@ -86,4 +86,21 @@ char** strSplit(char* a_str, const char a_delim){
 void GameOver(){
     printf("GAMEOVER\n"); // Place holder, for now.
 }
+bool victoryCheck(const Map* map){
+    // Check if there is ANY flagged tiles that don't have mines
+    int totalTiles = map->height * map->width;
+    Tile ** tiles = map->map;
+    for(int i = 0; i != totalTiles-1; i++){
+        if((*(tiles+i))->mine && ((*(tiles+i))->state != flagged)){
+            return false;
+        }
+    }
+    // Check if all tiles with mines are flagged
+    for(int i = 0; i != totalTiles-1; i++){
+        if(!((*(tiles+i))->mine) && ((*(tiles+i))->state == flagged)){
+            return false;
+        }
+    }
+    return true;
+}
 #endif

@@ -240,6 +240,10 @@ int main(int argc, char *argv[]){
                 printf("Please give a valid command. Try inputing 'h' if you need help. Remember, that case matters!\n");
                 break;
         }
+        if(victoryCheck(&mymap)){
+            printf("Victory!\n");
+            return true;
+        }
         fflush(stdin);
         Map_Draw(&mymap);
     }
